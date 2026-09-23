@@ -1,0 +1,9 @@
+# PyTorch med GPU installeres FØRST, separat (se under)
+torch
+torchvision
+
+opencv-python
+numpy
+pyyaml
+mediapipe
+pytest

@@ -4,8 +4,11 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torchvision
+from pathlib import Path
 
-MODEL_PATH = "models/heatmap_best.pt"
+ROOT = Path(__file__).resolve().parent.parent   # roten av repoet
+MODEL_PATH = ROOT / "models" / "heatmap_best.pt"
+
 CAMERA_ID = 0
 SIZE = 128        # samme som i treningen
 BOX = 300         # størrelse på firkanten i kamerabildet (piksler)
