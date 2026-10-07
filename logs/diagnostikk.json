@@ -1,177 +1,177 @@
 [
   {
     "test": "stein_rolig",
-    "bilder": 295,
-    "fps": 30.2,
-    "modell_ms_snitt": 11.3,
-    "modell_ms_verste": 214.2,
-    "skjelving_snitt_px": 3.05,
-    "skjelving_verste_punkt_px": 5.12,
+    "bilder": 292,
+    "fps": 30.3,
+    "modell_ms_snitt": 12.0,
+    "modell_ms_verste": 372.7,
+    "skjelving_snitt_px": 2.42,
+    "skjelving_verste_punkt_px": 4.3,
     "skjelving_per_finger": {
-      "tommel": 4.47,
-      "peke": 2.48,
-      "lang": 2.31,
-      "ring": 2.76,
-      "lille": 3.49
+      "tommel": 3.78,
+      "peke": 2.3,
+      "lang": 1.34,
+      "ring": 1.82,
+      "lille": 3.11
     },
-    "sikkerhet_snitt": 0.0344,
-    "sikkerhet_laveste_punkt": 0.012,
+    "sikkerhet_snitt": 0.0398,
+    "sikkerhet_laveste_punkt": 0.0151,
     "sikkerhet_per_finger": {
-      "tommel": 0.0392,
-      "peke": 0.0359,
-      "lang": 0.0309,
-      "ring": 0.0308,
-      "lille": 0.0401
+      "tommel": 0.0497,
+      "peke": 0.0343,
+      "lang": 0.036,
+      "ring": 0.0446,
+      "lille": 0.0396
     }
   },
   {
     "test": "papir_rolig",
     "bilder": 300,
     "fps": 30.1,
-    "modell_ms_snitt": 10.4,
-    "modell_ms_verste": 20.0,
-    "skjelving_snitt_px": 0.56,
-    "skjelving_verste_punkt_px": 0.89,
+    "modell_ms_snitt": 11.7,
+    "modell_ms_verste": 19.5,
+    "skjelving_snitt_px": 0.51,
+    "skjelving_verste_punkt_px": 0.76,
     "skjelving_per_finger": {
-      "tommel": 0.73,
-      "peke": 0.6,
-      "lang": 0.47,
-      "ring": 0.42,
-      "lille": 0.49
+      "tommel": 0.51,
+      "peke": 0.42,
+      "lang": 0.42,
+      "ring": 0.5,
+      "lille": 0.64
     },
-    "sikkerhet_snitt": 0.0359,
-    "sikkerhet_laveste_punkt": 0.017,
+    "sikkerhet_snitt": 0.0347,
+    "sikkerhet_laveste_punkt": 0.0143,
     "sikkerhet_per_finger": {
-      "tommel": 0.0484,
-      "peke": 0.0299,
-      "lang": 0.0293,
-      "ring": 0.0389,
-      "lille": 0.0341
+      "tommel": 0.0608,
+      "peke": 0.0384,
+      "lang": 0.0258,
+      "ring": 0.0282,
+      "lille": 0.0213
     }
   },
   {
     "test": "saks_rolig",
-    "bilder": 301,
-    "fps": 30.2,
-    "modell_ms_snitt": 10.3,
-    "modell_ms_verste": 19.0,
-    "skjelving_snitt_px": 1.72,
-    "skjelving_verste_punkt_px": 4.34,
+    "bilder": 300,
+    "fps": 30.1,
+    "modell_ms_snitt": 12.1,
+    "modell_ms_verste": 20.8,
+    "skjelving_snitt_px": 3.37,
+    "skjelving_verste_punkt_px": 9.18,
     "skjelving_per_finger": {
-      "tommel": 2.85,
-      "peke": 1.53,
-      "lang": 1.3,
-      "ring": 1.47,
-      "lille": 1.32
+      "tommel": 2.32,
+      "peke": 1.44,
+      "lang": 2.4,
+      "ring": 4.94,
+      "lille": 6.03
     },
-    "sikkerhet_snitt": 0.0499,
-    "sikkerhet_laveste_punkt": 0.0155,
+    "sikkerhet_snitt": 0.0694,
+    "sikkerhet_laveste_punkt": 0.0225,
     "sikkerhet_per_finger": {
-      "tommel": 0.0539,
-      "peke": 0.0569,
-      "lang": 0.0558,
-      "ring": 0.0477,
-      "lille": 0.0395
+      "tommel": 0.0883,
+      "peke": 0.0514,
+      "lang": 0.0595,
+      "ring": 0.0647,
+      "lille": 0.0792
     }
   },
   {
     "test": "saks_ring_lille",
     "bilder": 300,
     "fps": 30.1,
-    "modell_ms_snitt": 10.4,
-    "modell_ms_verste": 21.9,
-    "skjelving_snitt_px": 4.05,
-    "skjelving_verste_punkt_px": 7.51,
+    "modell_ms_snitt": 11.8,
+    "modell_ms_verste": 21.5,
+    "skjelving_snitt_px": 2.48,
+    "skjelving_verste_punkt_px": 5.71,
     "skjelving_per_finger": {
-      "tommel": 5.1,
-      "peke": 3.88,
-      "lang": 4.29,
-      "ring": 3.97,
-      "lille": 3.22
+      "tommel": 1.26,
+      "peke": 2.81,
+      "lang": 2.32,
+      "ring": 3.27,
+      "lille": 2.85
     },
-    "sikkerhet_snitt": 0.0542,
-    "sikkerhet_laveste_punkt": 0.0151,
+    "sikkerhet_snitt": 0.0506,
+    "sikkerhet_laveste_punkt": 0.0137,
     "sikkerhet_per_finger": {
-      "tommel": 0.0526,
-      "peke": 0.0429,
-      "lang": 0.0592,
-      "ring": 0.0522,
-      "lille": 0.0629
+      "tommel": 0.0644,
+      "peke": 0.0402,
+      "lang": 0.0445,
+      "ring": 0.0535,
+      "lille": 0.0577
     }
   },
   {
     "test": "bevegelse",
-    "bilder": 301,
-    "fps": 30.2,
-    "modell_ms_snitt": 10.3,
-    "modell_ms_verste": 19.9,
-    "skjelving_snitt_px": 7.79,
-    "skjelving_verste_punkt_px": 10.64,
+    "bilder": 300,
+    "fps": 30.1,
+    "modell_ms_snitt": 12.2,
+    "modell_ms_verste": 20.0,
+    "skjelving_snitt_px": 2.54,
+    "skjelving_verste_punkt_px": 3.97,
     "skjelving_per_finger": {
-      "tommel": 8.25,
-      "peke": 8.04,
-      "lang": 7.45,
-      "ring": 7.31,
-      "lille": 8.13
+      "tommel": 2.08,
+      "peke": 2.74,
+      "lang": 2.6,
+      "ring": 2.59,
+      "lille": 2.91
     },
-    "sikkerhet_snitt": 0.0479,
-    "sikkerhet_laveste_punkt": 0.0168,
+    "sikkerhet_snitt": 0.0482,
+    "sikkerhet_laveste_punkt": 0.0215,
     "sikkerhet_per_finger": {
-      "tommel": 0.0553,
-      "peke": 0.0435,
-      "lang": 0.0492,
-      "ring": 0.0441,
-      "lille": 0.049
+      "tommel": 0.0615,
+      "peke": 0.0451,
+      "lang": 0.0402,
+      "ring": 0.0444,
+      "lille": 0.0455
     }
   },
   {
     "test": "avstand_naer",
-    "bilder": 300,
+    "bilder": 299,
     "fps": 30.1,
-    "modell_ms_snitt": 10.4,
-    "modell_ms_verste": 20.8,
-    "skjelving_snitt_px": 7.29,
-    "skjelving_verste_punkt_px": 13.86,
+    "modell_ms_snitt": 12.3,
+    "modell_ms_verste": 21.7,
+    "skjelving_snitt_px": 6.15,
+    "skjelving_verste_punkt_px": 11.67,
     "skjelving_per_finger": {
-      "tommel": 8.98,
-      "peke": 6.47,
-      "lang": 6.13,
-      "ring": 6.54,
-      "lille": 8.7
+      "tommel": 7.58,
+      "peke": 5.64,
+      "lang": 4.99,
+      "ring": 5.98,
+      "lille": 7.22
     },
-    "sikkerhet_snitt": 0.0568,
-    "sikkerhet_laveste_punkt": 0.0182,
+    "sikkerhet_snitt": 0.0596,
+    "sikkerhet_laveste_punkt": 0.0188,
     "sikkerhet_per_finger": {
-      "tommel": 0.0537,
-      "peke": 0.0587,
-      "lang": 0.0543,
-      "ring": 0.0589,
-      "lille": 0.0614
+      "tommel": 0.062,
+      "peke": 0.0407,
+      "lang": 0.0584,
+      "ring": 0.0836,
+      "lille": 0.058
     }
   },
   {
     "test": "avstand_langt",
-    "bilder": 301,
-    "fps": 30.2,
-    "modell_ms_snitt": 10.5,
-    "modell_ms_verste": 19.0,
-    "skjelving_snitt_px": 0.5,
-    "skjelving_verste_punkt_px": 0.87,
+    "bilder": 300,
+    "fps": 30.0,
+    "modell_ms_snitt": 12.0,
+    "modell_ms_verste": 21.7,
+    "skjelving_snitt_px": 3.76,
+    "skjelving_verste_punkt_px": 6.66,
     "skjelving_per_finger": {
-      "tommel": 0.44,
-      "peke": 0.61,
-      "lang": 0.49,
-      "ring": 0.45,
-      "lille": 0.49
+      "tommel": 3.41,
+      "peke": 3.44,
+      "lang": 3.66,
+      "ring": 4.27,
+      "lille": 4.44
     },
-    "sikkerhet_snitt": 0.0314,
-    "sikkerhet_laveste_punkt": 0.0151,
+    "sikkerhet_snitt": 0.0584,
+    "sikkerhet_laveste_punkt": 0.025,
     "sikkerhet_per_finger": {
-      "tommel": 0.04,
-      "peke": 0.0291,
-      "lang": 0.0237,
-      "ring": 0.0312,
-      "lille": 0.0349
+      "tommel": 0.091,
+      "peke": 0.047,
+      "lang": 0.0444,
+      "ring": 0.0581,
+      "lille": 0.0508
     }
   }
 ]

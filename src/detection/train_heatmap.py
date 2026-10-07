@@ -11,15 +11,12 @@ import torchvision
 torch.set_num_threads(6)
 device = "cuda"
 
-HOURS = 9          # hvor lenge treningen skal gå totalt
+HOURS = 9
 BATCH = 256
 LR = 5e-4
 
 
-# ---------- Ressursmåling ----------
-
 def gpu_usage():
-    # Returnerer (GPU-bruk i %, VRAM brukt i GB) fra nvidia-smi
     try:
         out = subprocess.run(
             ["nvidia-smi", "--query-gpu=utilization.gpu,memory.used", "--format=csv,noheader,nounits"],
@@ -32,7 +29,6 @@ def gpu_usage():
 
 
 def ram_usage():
-    # RAM brukt av denne prosessen i GB
     with open("/proc/self/status") as f:
         for line in f:
             if line.startswith("VmRSS"):
@@ -41,15 +37,12 @@ def ram_usage():
 
 
 def container_ram():
-    # RAM brukt av hele containeren i GB (grensen er 96 GB)
     try:
         with open("/sys/fs/cgroup/memory.current") as f:
             return int(f.read()) / 1024 ** 3
     except Exception:
         return float("nan")
 
-
-# ---------- Modell (Simple Baselines + Integral Regression) ----------
 
 class HeatmapModel(nn.Module):
     def __init__(self):
@@ -83,8 +76,6 @@ class HeatmapModel(nn.Module):
         return torch.stack([px, py], dim=2).view(b, 42)
 
 
-# ---------- Data ----------
-
 data = np.load("data/processed/freihand_128.npz")
 images = torch.from_numpy(data["images"]).to(device)
 keypoints = torch.from_numpy(data["keypoints"]).to(device)
@@ -98,10 +89,8 @@ std = torch.tensor([0.229, 0.224, 0.225], device=device).view(1, 3, 1, 1)
 
 
 def augment(x, y):
-    # x: (B, 3, H, W) i 0-1, y: (B, 21, 2) i 0-1
     b = x.shape[0]
 
-    # Tilfeldig rotasjon, skalering, speiling og forskyvning
     angle = torch.empty(b, device=device).uniform_(-30, 30) * math.pi / 180
     scale = torch.empty(b, device=device).uniform_(0.85, 1.15)
     flip = torch.where(torch.rand(b, device=device) < 0.5, -1.0, 1.0)
@@ -110,19 +99,16 @@ def augment(x, y):
     cos = torch.cos(angle) * scale
     sin = torch.sin(angle) * scale
 
-    # A: flytter punkter fra originalbildet til det nye bildet (koordinater i -1 til 1)
     A = torch.zeros(b, 2, 2, device=device)
     A[:, 0, 0] = cos * flip
     A[:, 0, 1] = -sin
     A[:, 1, 0] = sin * flip
     A[:, 1, 1] = cos
 
-    # Punktene
     p = y * 2 - 1
     p = torch.bmm(p, A.transpose(1, 2)) + shift.unsqueeze(1)
     y_new = (p + 1) / 2
 
-    # Bildet: grid_sample trenger motsatt vei (nytt bilde -> original)
     A_inv = torch.linalg.inv(A)
     theta = torch.zeros(b, 2, 3, device=device)
     theta[:, :, :2] = A_inv
@@ -131,7 +117,6 @@ def augment(x, y):
     grid = F.affine_grid(theta, x.shape, align_corners=False)
     x_new = F.grid_sample(x, grid, align_corners=False, padding_mode="zeros")
 
-    # Lysstyrke og kontrast
     brightness = torch.empty(b, 1, 1, 1, device=device).uniform_(0.7, 1.3)
     contrast = torch.empty(b, 1, 1, 1, device=device).uniform_(0.7, 1.3)
     avg = x_new.mean(dim=(1, 2, 3), keepdim=True)
@@ -148,8 +133,6 @@ def get_batch(idx, train):
     x = (x - mean) / std
     return x, y.reshape(-1, 42)
 
-
-# ---------- Trening ----------
 
 model = HeatmapModel().to(device)
 optimizer = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=1e-4)
@@ -182,7 +165,6 @@ while total_epochs is None or epoch < total_epochs:
         scaler.update()
         train_losses.append(loss.item())
 
-        # Mål GPU-bruk jevnlig under treningen
         if i % 50 == 25:
             gpu_samples.append(gpu_usage())
 
@@ -200,7 +182,6 @@ while total_epochs is None or epoch < total_epochs:
     epoch_time = time.time() - epoch_start
     lr = optimizer.param_groups[0]["lr"]
 
-    # Etter første epoke: regn ut hvor mange epoker som får plass i tiden
     if total_epochs is None:
         total_epochs = max(2, int(HOURS * 3600 / epoch_time))
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=total_epochs - 1)
@@ -208,12 +189,10 @@ while total_epochs is None or epoch < total_epochs:
     else:
         scheduler.step()
 
-    # Ressurser for denne epoken
-    cpu_percent = (time.process_time() - cpu_start) / epoch_time * 100   # 100 % = én kjerne
+    cpu_percent = (time.process_time() - cpu_start) / epoch_time * 100
     gpu_util = np.mean([s[0] for s in gpu_samples]) if gpu_samples else float("nan")
     vram = max([s[1] for s in gpu_samples]) if gpu_samples else float("nan")
 
-    # Tid
     elapsed = time.time() - start_time
     remaining = (total_epochs - epoch - 1) * epoch_time
     finish = datetime.now() + timedelta(seconds=remaining)

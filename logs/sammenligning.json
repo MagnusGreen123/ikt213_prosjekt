@@ -1,0 +1,142 @@
+[
+  {
+    "test": "stein_rolig",
+    "bilder": 273,
+    "mediapipe_mistet_hand": 0,
+    "mediapipe_ms": 19.2,
+    "egen_modell_ms": 11.4,
+    "handstorrelse_px": 80.5,
+    "avvik_snitt_px": 3.16,
+    "avvik_snitt_andel_av_hand": 0.039,
+    "avvik_verste_punkt_px": 4.85,
+    "avvik_per_finger_px": {
+      "tommel": 4.26,
+      "peke": 3.75,
+      "lang": 2.13,
+      "ring": 1.68,
+      "lille": 3.55
+    },
+    "skjelving_egen_px": 1.0,
+    "skjelving_mediapipe_px": 0.66
+  },
+  {
+    "test": "papir_rolig",
+    "bilder": 241,
+    "mediapipe_mistet_hand": 0,
+    "mediapipe_ms": 18.9,
+    "egen_modell_ms": 17.6,
+    "handstorrelse_px": 107.3,
+    "avvik_snitt_px": 7.28,
+    "avvik_snitt_andel_av_hand": 0.068,
+    "avvik_verste_punkt_px": 11.99,
+    "avvik_per_finger_px": {
+      "tommel": 7.4,
+      "peke": 8.05,
+      "lang": 5.08,
+      "ring": 7.53,
+      "lille": 8.43
+    },
+    "skjelving_egen_px": 1.44,
+    "skjelving_mediapipe_px": 0.59
+  },
+  {
+    "test": "saks_rolig",
+    "bilder": 240,
+    "mediapipe_mistet_hand": 0,
+    "mediapipe_ms": 18.9,
+    "egen_modell_ms": 17.9,
+    "handstorrelse_px": 97.2,
+    "avvik_snitt_px": 4.99,
+    "avvik_snitt_andel_av_hand": 0.051,
+    "avvik_verste_punkt_px": 10.54,
+    "avvik_per_finger_px": {
+      "tommel": 5.71,
+      "peke": 4.74,
+      "lang": 3.29,
+      "ring": 4.4,
+      "lille": 6.49
+    },
+    "skjelving_egen_px": 1.67,
+    "skjelving_mediapipe_px": 0.87
+  },
+  {
+    "test": "saks_ring_lille",
+    "bilder": 242,
+    "mediapipe_mistet_hand": 0,
+    "mediapipe_ms": 18.7,
+    "egen_modell_ms": 17.6,
+    "handstorrelse_px": 87.9,
+    "avvik_snitt_px": 39.52,
+    "avvik_snitt_andel_av_hand": 0.45,
+    "avvik_verste_punkt_px": 99.82,
+    "avvik_per_finger_px": {
+      "tommel": 11.44,
+      "peke": 53.51,
+      "lang": 53.67,
+      "ring": 43.45,
+      "lille": 40.53
+    },
+    "skjelving_egen_px": 5.84,
+    "skjelving_mediapipe_px": 0.76
+  },
+  {
+    "test": "bevegelse",
+    "bilder": 241,
+    "mediapipe_mistet_hand": 0,
+    "mediapipe_ms": 18.9,
+    "egen_modell_ms": 17.6,
+    "handstorrelse_px": 93.7,
+    "avvik_snitt_px": 12.14,
+    "avvik_snitt_andel_av_hand": 0.13,
+    "avvik_verste_punkt_px": 32.45,
+    "avvik_per_finger_px": {
+      "tommel": 13.84,
+      "peke": 7.53,
+      "lang": 6.73,
+      "ring": 12.65,
+      "lille": 20.59
+    },
+    "skjelving_egen_px": 5.8,
+    "skjelving_mediapipe_px": 4.35
+  },
+  {
+    "test": "avstand_naer",
+    "bilder": 240,
+    "mediapipe_mistet_hand": 0,
+    "mediapipe_ms": 19.1,
+    "egen_modell_ms": 17.7,
+    "handstorrelse_px": 161.5,
+    "avvik_snitt_px": 23.29,
+    "avvik_snitt_andel_av_hand": 0.144,
+    "avvik_verste_punkt_px": 53.69,
+    "avvik_per_finger_px": {
+      "tommel": 28.02,
+      "peke": 16.26,
+      "lang": 16.52,
+      "ring": 23.03,
+      "lille": 34.66
+    },
+    "skjelving_egen_px": 8.16,
+    "skjelving_mediapipe_px": 3.68
+  },
+  {
+    "test": "avstand_langt",
+    "bilder": 240,
+    "mediapipe_mistet_hand": 0,
+    "mediapipe_ms": 18.8,
+    "egen_modell_ms": 17.7,
+    "handstorrelse_px": 96.0,
+    "avvik_snitt_px": 11.85,
+    "avvik_snitt_andel_av_hand": 0.123,
+    "avvik_verste_punkt_px": 27.36,
+    "avvik_per_finger_px": {
+      "tommel": 14.66,
+      "peke": 7.79,
+      "lang": 7.88,
+      "ring": 9.59,
+      "lille": 19.63
+    },
+    "skjelving_egen_px": 3.75,
+    "skjelving_mediapipe_px": 1.93
+  }
+]

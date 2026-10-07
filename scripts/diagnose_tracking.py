@@ -12,7 +12,7 @@ MODEL_PATH = ROOT / "models" / "heatmap_best.pt"
 CAMERA_ID = 0
 SIZE = 128
 BOX = 300
-SECONDS = 10          # hvor lenge hver maaling varer
+SECONDS = 10
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -48,7 +48,6 @@ class HeatmapModel(nn.Module):
         px = (prob.sum(dim=2) * xs).sum(dim=2)
         py = (prob.sum(dim=3) * ys).sum(dim=2)
 
-        # Hoyeste verdi i hvert heatmap sier hvor sikker modellen er
         confidence = prob.view(b, k, h * w).max(dim=2).values
 
         return torch.stack([px, py], dim=2), confidence
@@ -78,9 +77,8 @@ def predict(frame, x0, y0):
 def run_test(name, instruction):
     print(f"\n=== {name} ===")
     print(instruction)
-    print("Trykk mellomrom for aa starte, q for aa hoppe over")
+    print("Trykk mellomrom for å starte, q for å hoppe over")
 
-    # Vis kamera til brukeren trykker
     while True:
         ok, frame = cap.read()
         if not ok:
@@ -128,11 +126,10 @@ def run_test(name, instruction):
         cv2.imshow("Diagnostikk", frame)
         cv2.waitKey(1)
 
-    points = np.array(all_points) * BOX   # piksler i utsnittet
+    points = np.array(all_points) * BOX
     conf = np.array(all_conf)
 
-    # Skjelving: hvor mye hvert punkt flytter seg mellom nabobilder
-    steps = np.linalg.norm(np.diff(points, axis=0), axis=2)   # (bilder-1, 21)
+    steps = np.linalg.norm(np.diff(points, axis=0), axis=2)
 
     fps = len(frame_times) / (frame_times[-1] - frame_times[0]) if len(frame_times) > 1 else 0
 

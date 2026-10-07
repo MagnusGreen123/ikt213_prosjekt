@@ -1,0 +1,52 @@
+[
+  {
+    "test": "stein_rolig",
+    "bilder": 459,
+    "bilder_med_begge": 161,
+    "tid_total_ms": 12.2,
+    "tid_total_p95_ms": 17.6,
+    "tid_detektor_ms": 6.4,
+    "tid_landmarks_ms": 6.4,
+    "tid_mediapipe_ms": 12.9,
+    "detektor_kjort_andel": 1.0,
+    "bokskollaps": 0,
+    "ingen_hand_funnet": 44,
+    "mediapipe_mistet_hand": 298,
+    "boks_storrelse_px": 426.3,
+    "boks_storrelse_std": 140.4,
+    "avvik_px": 4.13,
+    "avvik_andel_av_hand": 0.049,
+    "avvik_verste_punkt_px": 7.28,
+    "avvik_per_finger_px": {
+      "tommel": 3.1,
+      "peke": 4.83,
+      "lang": 4.62,
+      "ring": 4.57,
+      "lille": 3.97
+    },
+    "skjelving_egen_px": 3.15,
+    "skjelving_mediapipe_px": 2.22,
+    "utstrekning_egen": {
+      "tommel": 1.04,
+      "peke": 0.18,
+      "lang": 0.24,
+      "ring": 0.26,
+      "lille": 0.2
+    },
+    "utstrekning_mediapipe": {
+      "tommel": 1.04,
+      "peke": 0.2,
+      "lang": 0.21,
+      "ring": 0.18,
+      "lille": 0.18
+    },
+    "utstrekning_feil": {
+      "tommel": 0.017,
+      "peke": 0.027,
+      "lang": 0.036,
+      "ring": 0.083,
+      "lille": 0.027
+    },
+    "sikkerhet_snitt": 0.0505
+  }
+]

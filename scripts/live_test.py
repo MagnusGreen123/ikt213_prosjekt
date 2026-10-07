@@ -6,17 +6,15 @@ import torch.nn as nn
 import torchvision
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent   # roten av repoet
-MODEL_PATH = ROOT / "models" / "heatmap_best.pt"
-
+ROOT = Path(__file__).resolve().parent.parent
+MODEL_PATH = ROOT / "models" / "finetuned_best.pt"
 CAMERA_ID = 0
-SIZE = 128        # samme som i treningen
-BOX = 300         # størrelse på firkanten i kamerabildet (piksler)
+SIZE = 128
+BOX = 300
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 
-# Samme modell som i train_heatmap.py (kopiert så treningen ikke starter ved import)
 class HeatmapModel(nn.Module):
     def __init__(self):
         super().__init__()
@@ -49,7 +47,6 @@ class HeatmapModel(nn.Module):
         return torch.stack([px, py], dim=2).view(b, 42)
 
 
-# Linjer mellom punktene: håndledd til hver finger, så leddene i fingeren
 BONES = []
 for base in [1, 5, 9, 13, 17]:
     BONES.append((0, base))
@@ -57,7 +54,6 @@ for base in [1, 5, 9, 13, 17]:
     BONES.append((base + 1, base + 2))
     BONES.append((base + 2, base + 3))
 
-# Én farge per finger
 COLORS = [(0, 0, 255), (0, 165, 255), (0, 255, 0), (255, 0, 0), (255, 0, 255)]
 
 
@@ -75,15 +71,13 @@ while True:
     if not ok:
         break
 
-    frame = cv2.flip(frame, 1)  # speilvendt, føles mer naturlig
+    frame = cv2.flip(frame, 1)
     h, w = frame.shape[:2]
 
-    # Fast firkant midt i bildet
     x0 = w // 2 - BOX // 2
     y0 = h // 2 - BOX // 2
     crop = frame[y0:y0 + BOX, x0:x0 + BOX]
 
-    # Samme forbehandling som i treningen: RGB, 128 x 128, normalisering
     start = time.perf_counter()
     rgb = cv2.cvtColor(crop, cv2.COLOR_BGR2RGB)
     small = cv2.resize(rgb, (SIZE, SIZE))
@@ -94,7 +88,6 @@ while True:
         pred = model(x).view(21, 2).cpu().numpy()
     ms = (time.perf_counter() - start) * 1000
 
-    # Fra 0-1 i utsnittet til piksler i kamerabildet
     points = []
     for px, py in pred:
         points.append((int(x0 + px * BOX), int(y0 + py * BOX)))
