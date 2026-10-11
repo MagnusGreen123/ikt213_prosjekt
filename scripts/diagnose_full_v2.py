@@ -11,7 +11,7 @@ sys.path.insert(0, str(ROOT))
 from src.detection.pipeline import HandPipeline, draw_hand, draw_box
 
 DETECTOR_PATH = ROOT / "models" / "detector_palm.pt"
-LANDMARK_PATH = ROOT / "models" / "finetuned_palm.pt"
+LANDMARK_PATH = ROOT / "models" / "finetuned_palm_frei_v3_70.pt"
 OUT = ROOT / "logs" / "diagnose_full.json"
 
 CAMERA_ID = 0
