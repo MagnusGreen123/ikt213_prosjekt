@@ -14,11 +14,11 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 OWN = ROOT / "data" / "processed" / "own_128_palm.npz"
 FREIHAND = ROOT / "data" / "processed" / "freihand_128.npz"
 START_MODEL = ROOT / "models" / "heatmap_best.pt"
-OUT_MODEL = ROOT / "models" / "finetuned_palm_frei.pt"
+OUT_MODEL = ROOT / "models" / "finetuned_palm_frei_v3_70.pt"
 EPOCHS = 60
 BATCH = 128
 LR = 1e-4
-FREIHAND_SHARE = 0.3
+FREIHAND_SHARE = 0.7
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print("Enhet:", device)
