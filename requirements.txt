@@ -1,9 +1,7 @@
-# PyTorch med GPU installeres FØRST, separat (se under)
-torch
-torchvision
+# PyTorch installeres FØRST og separat, fra egen indeks:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+# Testet med torch 2.11.0+cu128 / torchvision 0.26.0+cu128
 
-opencv-python
-numpy
-pyyaml
-mediapipe
-pytest
+mediapipe==0.10.14
+numpy==2.5.3
+opencv-python==5.0.0.93
