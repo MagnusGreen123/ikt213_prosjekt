@@ -13,9 +13,9 @@ CAMERA_ID = 0
 WIDTH = 1280
 HEIGHT = 720
 
-PERSON = "magnus"
-THROWS = 100
-COUNTDOWN = 3
+PERSON = "NAME"                # your own name, no underscores
+SESSION_THROWS = 500           # saved throws per session; None = no limit (stop with q)
+COUNTDOWN = 2
 RECORD_SECONDS = 2.3
 PAUSE_SECONDS = 1.0
 
@@ -43,6 +43,39 @@ print("Oppløsning:", cap.get(cv2.CAP_PROP_FRAME_WIDTH), "x", cap.get(cv2.CAP_PR
 print("FPS (rapportert):", cap.get(cv2.CAP_PROP_FPS))
 
 OUT_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def last_index(gesture):
+    """Highest existing throw number for this gesture and person (0 if none)."""
+    nums = [
+        int(p.stem.rsplit("_", 1)[1])
+        for p in OUT_DIR.glob(f"{gesture}_{PERSON}_*.npz")
+    ]
+    return max(nums, default=0)
+
+
+# --- State is read from disk at startup, so the program can be stopped and
+# --- restarted at any time without losing count or overwriting files.
+counts = {g: last_index(g) for g in GESTURES}      # next file number base, per gesture
+totals = {g: len(list(OUT_DIR.glob(f"{g}_{PERSON}_*.npz"))) for g in GESTURES}
+total_all = len(list(OUT_DIR.glob("*.npz")))       # every throw in the dataset
+saved = []                                         # throws saved in THIS session
+bag = []                                           # shuffle bag for gesture order
+
+
+def status_lines():
+    limit = f"/{SESSION_THROWS}" if SESSION_THROWS else ""
+    return [
+        f"Økt: {len(saved)}{limit} lagret",
+        f"Totalt lagret: {total_all} ({PERSON}: {sum(totals.values())})",
+    ]
+
+
+def next_gesture():
+    """Random order, balanced within every bag of 30."""
+    if not bag:
+        bag.extend(random.sample(GESTURES * 10, 30))
+    return bag.pop()
 
 
 def read_frame():
@@ -81,7 +114,7 @@ def big_text(frame, text, color):
     cv2.putText(frame, text, pos, cv2.FONT_HERSHEY_SIMPLEX, 4.0, color, 8)
 
 
-def countdown(gesture, throw_number, total):
+def countdown(gesture):
     start = time.perf_counter()
     while True:
         elapsed = time.perf_counter() - start
@@ -94,15 +127,27 @@ def countdown(gesture, throw_number, total):
 
         igjen = int(COUNTDOWN - elapsed) + 1
         big_text(frame, str(igjen), (0, 200, 255))
-        show(frame, [
-            f"Kast {throw_number}/{total}",
+        show(frame, status_lines() + [
             f"Neste: {NORSK[gesture]}",
             "Start med knyttet hand",
-            "q = avslutt",
+            "p = pause, q = avslutt",
         ])
         key = cv2.waitKey(1) & 0xFF
         if key == ord("q"):
             return False
+
+        if key == ord("p"):
+            # Pause: keep reading frames (so the camera buffer stays fresh)
+            # until p is pressed again, then restart the countdown.
+            while True:
+                frame, _ = read_frame()
+                if frame is None:
+                    return False
+                big_text(frame, "PAUSE", (0, 200, 255))
+                show(frame, status_lines() + ["p = fortsett"], (0, 200, 255))
+                if cv2.waitKey(1) & 0xFF == ord("p"):
+                    break
+            start = time.perf_counter()
 
 
 def record_throw(gesture):
@@ -132,7 +177,7 @@ def record_throw(gesture):
             draw_landmarks(frame, points)
 
         big_text(frame, NORSK[gesture], (0, 0, 255))
-        cv2.imshow("Opptak", frame)
+        show(frame, status_lines())
         cv2.waitKey(1)
 
     if not times:
@@ -154,6 +199,10 @@ def filter_jumps(points, times, images):
 
 
 def save_throw(number, gesture, points, times, images):
+    # Never overwrite: if this number is taken, move to the next free one.
+    while (OUT_DIR / f"{gesture}_{PERSON}_{number:03d}.npz").exists():
+        number += 1
+
     name = f"{gesture}_{PERSON}_{number:03d}"
     np.savez(
         OUT_DIR / f"{name}.npz",
@@ -165,7 +214,9 @@ def save_throw(number, gesture, points, times, images):
 
     if images:
         img_dir = OUT_DIR / name
-        img_dir.mkdir(exist_ok=True)
+        if img_dir.exists():
+            shutil.rmtree(img_dir)   # remove leftover frames from an older run
+        img_dir.mkdir()
         for i, img in enumerate(images):
             cv2.imwrite(str(img_dir / f"{i:04d}.jpg"), img)
 
@@ -181,18 +232,21 @@ def delete_throw(name):
         shutil.rmtree(img_dir)
 
 
-order = (GESTURES * (THROWS // 3 + 1))[:THROWS]
-random.shuffle(order)
-
-print(f"\nTar opp {THROWS} kast som '{PERSON}'.")
+print(f"\nPerson: '{PERSON}'")
+print("Allerede lagret: " + ", ".join(f"{g} {totals[g]}" for g in GESTURES))
+print(f"Totalt i datasettet: {total_all}")
+if SESSION_THROWS:
+    print(f"Mål denne økten: {SESSION_THROWS} lagrede kast")
+else:
+    print("Ingen grense denne økten (avslutt med q)")
 print("Start med knyttet hand, pump 2-3 ganger, kast i normalt spilltempo.")
-print("Mellomrom = start, u = slett forrige kast, q = avslutt\n")
+print("Mellomrom = start, u = slett forrige kast, p = pause, q = avslutt\n")
 
 while True:
     frame, _ = read_frame()
     if frame is None:
         break
-    show(frame, ["Mellomrom = start opptak", "q = avslutt"])
+    show(frame, ["Mellomrom = start opptak", "q = avslutt"] + status_lines())
     key = cv2.waitKey(1) & 0xFF
     if key == ord(" "):
         break
@@ -201,16 +255,17 @@ while True:
         cv2.destroyAllWindows()
         raise SystemExit
 
-saved = []
-counts = {g: 0 for g in GESTURES}
+attempt = 0
 
-for i, gesture in enumerate(order, start=1):
-    if not countdown(gesture, i, THROWS):
+while SESSION_THROWS is None or len(saved) < SESSION_THROWS:
+    gesture = next_gesture()
+    if not countdown(gesture):
         break
 
+    attempt += 1
     result = record_throw(gesture)
     if result is None:
-        print(f"Kast {i}: ingen hånd funnet i det hele tatt, hopper over")
+        print(f"Forsøk {attempt}: ingen hånd funnet i det hele tatt, hopper over")
         continue
 
     points, times, images, total_frames, missed = result
@@ -219,7 +274,7 @@ for i, gesture in enumerate(order, start=1):
     steps = np.diff(times)
     fps = len(times) / times[-1] if times[-1] > 0 else 0
 
-    print(f"Kast {i}/{THROWS} [{gesture}]:")
+    print(f"Forsøk {attempt} [{gesture}]:")
     print(f"  kamera: {total_frames} bilder, MediaPipe mistet handen i {missed}")
     print(f"  filter forkastet: {dropped}, beholdt: {len(points)}")
     print(f"  effektiv fps: {fps:.1f}")
@@ -233,7 +288,9 @@ for i, gesture in enumerate(order, start=1):
         print("  ADVARSEL: få bilder, sjekk lys og at handen er synlig")
 
     name = save_throw(counts[gesture] + 1, gesture, points, times, images)
-    counts[gesture] += 1
+    counts[gesture] = int(name.rsplit("_", 1)[1])
+    totals[gesture] += 1
+    total_all += 1
     saved.append(name)
 
     start = time.perf_counter()
@@ -241,17 +298,21 @@ for i, gesture in enumerate(order, start=1):
         frame, _ = read_frame()
         if frame is None:
             break
-        show(frame, [f"Lagret: {len(points)} bilder", "u = angre dette kastet"])
+        show(frame, [f"Lagret {name}: {len(points)} bilder"] + status_lines()
+             + ["u = angre dette kastet"])
         key = cv2.waitKey(1) & 0xFF
         if key == ord("u") and saved:
             delete_throw(saved.pop())
-            counts[gesture] -= 1
+            counts[gesture] = last_index(gesture)
+            totals[gesture] -= 1
+            total_all -= 1
             print("  Angret, kastet er slettet")
             break
 
 cap.release()
 cv2.destroyAllWindows()
 
-print(f"\nFerdig. {len(saved)} kast lagret i {OUT_DIR}")
+print(f"\nFerdig. {len(saved)} kast lagret denne økten i {OUT_DIR}")
+print(f"Totalt i datasettet: {total_all}")
 for g in GESTURES:
-    print(f"  {g}: {counts[g]}")
+    print(f"  {g}: {totals[g]} ({PERSON})")
