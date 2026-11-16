@@ -7,14 +7,15 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchvision
+from aug_extra import extra_augment
 
 torch.set_num_threads(6)
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-OWN = ROOT / "data" / "processed" / "own_128_palm.npz"
+OWN = ROOT / "data" / "processed" / "own_128_palm_stor.npz"
 FREIHAND = ROOT / "data" / "processed" / "freihand_128.npz"
 START_MODEL = ROOT / "models" / "heatmap_best.pt"
-OUT_MODEL = ROOT / "models" / "finetuned_palm_frei_v3_70.pt"
+OUT_MODEL = ROOT / "models" / "finetuned_palm_frei_v4_aug_heavy.pt"
 EPOCHS = 60
 BATCH = 128
 LR = 1e-4
@@ -63,8 +64,10 @@ throw_id = own["throw_id"]
 
 print(f"Egne data: {len(own_images)} bilder fra {throw_id.max() + 1} kast")
 
-n_throws = throw_id.max() + 1
-val_throws = set(range(0, n_throws, 5))
+person = own["person"]
+
+mine = np.unique(throw_id[person == "magnus"])
+val_throws = set(mine[::5])
 is_val = np.array([t in val_throws for t in throw_id])
 
 own_train = torch.from_numpy(np.where(~is_val)[0]).to(device)
@@ -75,10 +78,10 @@ print(f"  trening: {len(own_train)} bilder, validering: {len(own_val)} bilder")
 frei_images = frei_kp = frei_train = None
 if FREIHAND_SHARE > 0 and FREIHAND.exists():
     frei = np.load(FREIHAND)
-    frei_images = torch.from_numpy(frei["images"]).to(device)
-    frei_kp = torch.from_numpy(frei["keypoints"]).to(device)
-    pose_id = torch.from_numpy(frei["pose_id"]).to(device)
-    frei_train = torch.where(pose_id < 29000)[0]
+    keep = np.where(frei["pose_id"] < 29000)[0]
+    frei_images = torch.from_numpy(frei["images"][keep]).to(device)
+    frei_kp = torch.from_numpy(frei["keypoints"][keep]).to(device)
+    frei_train = torch.arange(len(keep), device=device)
     print(f"FreiHAND: {len(frei_train)} bilder blandes inn ({FREIHAND_SHARE:.0%} av hver batch)")
 else:
     FREIHAND_SHARE = 0.0
@@ -91,10 +94,10 @@ std = torch.tensor([0.229, 0.224, 0.225], device=device).view(1, 3, 1, 1)
 
 def augment(x, y):
     b = x.shape[0]
-    angle = torch.empty(b, device=device).uniform_(-25, 25) * math.pi / 180
-    scale = torch.empty(b, device=device).uniform_(0.9, 1.1)
+    angle = torch.empty(b, device=device).uniform_(-90, 90) * math.pi / 180
+    scale = torch.empty(b, device=device).uniform_(0.8, 1.15)
+    shift = torch.empty(b, 2, device=device).uniform_(-0.10, 0.10)
     flip = torch.where(torch.rand(b, device=device) < 0.5, -1.0, 1.0)
-    shift = torch.empty(b, 2, device=device).uniform_(-0.04, 0.04)
 
     cos = torch.cos(angle) * scale
     sin = torch.sin(angle) * scale
@@ -118,6 +121,7 @@ def augment(x, y):
     x_new = F.grid_sample(x, grid, align_corners=False, padding_mode="zeros")
 
     brightness = torch.empty(b, 1, 1, 1, device=device).uniform_(0.75, 1.25)
+    x_new = extra_augment(x_new)
     contrast = torch.empty(b, 1, 1, 1, device=device).uniform_(0.75, 1.25)
     avg = x_new.mean(dim=(1, 2, 3), keepdim=True)
     x_new = ((x_new - avg) * contrast + avg) * brightness

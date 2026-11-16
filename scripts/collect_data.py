@@ -1,3 +1,4 @@
+import sys
 import time
 import random
 import shutil
@@ -7,14 +8,18 @@ import numpy as np
 import mediapipe as mp
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+from src.classification import gesture as G
+
 OUT_DIR = ROOT / "data" / "recordings"
 
 CAMERA_ID = 0
 WIDTH = 1280
 HEIGHT = 720
 
-PERSON = "magnus"
-THROWS = 100
+MODE = "ring_little"
+PERSON = "magnusrl"
+THROWS = 45
 COUNTDOWN = 3
 RECORD_SECONDS = 2.3
 PAUSE_SECONDS = 1.0
@@ -26,6 +31,11 @@ MIN_CONFIDENCE = 0.5
 MAX_JUMP = 0.25
 
 NORSK = {"rock": "STEIN", "paper": "PAPIR", "scissors": "SAKS"}
+if MODE == "ring_little":
+    NORSK["scissors"] = "SAKS R+L"
+VARIANT = "ring_little" if MODE == "ring_little" else "normal"
+CHECK_FRAMES = 10
+RING_LITTLE = [False, False, True, True]
 
 
 hands = mp.solutions.hands.Hands(
@@ -58,6 +68,17 @@ def detect(frame):
         return None
     hand = result.multi_hand_landmarks[0]
     return np.array([[lm.x, lm.y, lm.z] for lm in hand.landmark], dtype=np.float32)
+
+
+def extended_fingers(points, frame_shape):
+    h, w = frame_shape[:2]
+    pts = points[:, :2] * [w, h]
+    values, threshold = G.finger_values(pts)
+    return [bool(v > threshold) for v in values]
+
+
+def finger_text(ext):
+    return "I M R L = " + " ".join("1" if e else "0" for e in ext)
 
 
 def draw_landmarks(frame, points):
@@ -130,6 +151,10 @@ def record_throw(gesture):
             if SAVE_IMAGES:
                 images.append(frame.copy())
             draw_landmarks(frame, points)
+            ext = extended_fingers(points, frame.shape)
+            col = (0, 255, 0) if (MODE != "ring_little" or ext == RING_LITTLE) else (0, 165, 255)
+            cv2.putText(frame, "MediaPipe: " + finger_text(ext), (20, frame.shape[0] - 30),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1.0, col, 2)
 
         big_text(frame, NORSK[gesture], (0, 0, 255))
         cv2.imshow("Opptak", frame)
@@ -146,11 +171,27 @@ def filter_jumps(points, times, images):
     for i in range(1, len(points)):
         dt = times[i] - times[i - 1]
         step = np.linalg.norm(points[i][:, :2] - points[i - 1][:, :2], axis=1).max()
-        if step < 200.0 * dt:
+        if step < MAX_JUMP:
             keep.append(i)
 
     images_kept = [images[i] for i in keep] if images else []
     return points[keep], times[keep], images_kept, len(points) - len(keep)
+
+
+def next_number(gesture):
+    numbers = [0]
+    for f in OUT_DIR.glob(f"{gesture}_{PERSON}_*.npz"):
+        try:
+            numbers.append(int(f.stem.split("_")[-1]))
+        except ValueError:
+            pass
+    return max(numbers) + 1
+
+
+def check_final_pose(points, frame_shape):
+    last = points[-CHECK_FRAMES:]
+    good = sum(extended_fingers(p, frame_shape) == RING_LITTLE for p in last)
+    return good, len(last)
 
 
 def save_throw(number, gesture, points, times, images):
@@ -161,6 +202,7 @@ def save_throw(number, gesture, points, times, images):
         times=times,
         label=gesture,
         person=PERSON,
+        variant=VARIANT,
     )
 
     if images:
@@ -181,10 +223,15 @@ def delete_throw(name):
         shutil.rmtree(img_dir)
 
 
-order = (GESTURES * (THROWS // 3 + 1))[:THROWS]
-random.shuffle(order)
+if MODE == "ring_little":
+    order = ["scissors"] * THROWS
+else:
+    order = (GESTURES * (THROWS // 3 + 1))[:THROWS]
+    random.shuffle(order)
 
-print(f"\nTar opp {THROWS} kast som '{PERSON}'.")
+print(f"\nTar opp {THROWS} kast som '{PERSON}', modus {MODE}.")
+if MODE == "ring_little":
+    print("Saks med RINGFINGER og LILLEFINGER. Peke- og langfinger bøyd.")
 print("Start med knyttet hand, pump 2-3 ganger, kast i normalt spilltempo.")
 print("Mellomrom = start, u = slett forrige kast, q = avslutt\n")
 
@@ -203,6 +250,8 @@ while True:
 
 saved = []
 counts = {g: 0 for g in GESTURES}
+mp_ok = 0
+frame_shape = (HEIGHT, WIDTH)
 
 for i, gesture in enumerate(order, start=1):
     if not countdown(gesture, i, THROWS):
@@ -215,6 +264,8 @@ for i, gesture in enumerate(order, start=1):
 
     points, times, images, total_frames, missed = result
     points, times, images, dropped = filter_jumps(points, times, images)
+    if images:
+        frame_shape = images[0].shape
 
     steps = np.diff(times)
     fps = len(times) / times[-1] if times[-1] > 0 else 0
@@ -232,7 +283,19 @@ for i, gesture in enumerate(order, start=1):
     if len(points) < 20:
         print("  ADVARSEL: få bilder, sjekk lys og at handen er synlig")
 
-    name = save_throw(counts[gesture] + 1, gesture, points, times, images)
+    check = ""
+    last_ok = False
+    if MODE == "ring_little":
+        good, n = check_final_pose(points, frame_shape)
+        if good >= n / 2:
+            mp_ok += 1
+            last_ok = True
+        else:
+            print(f"  ADVARSEL: MediaPipe ser ring+lille strake i bare {good}/{n} av de siste bildene")
+        print(f"  MediaPipe riktig mønster: {good}/{n} siste bilder")
+        check = f"MediaPipe riktig: {good}/{n}"
+
+    name = save_throw(next_number(gesture), gesture, points, times, images)
     counts[gesture] += 1
     saved.append(name)
 
@@ -241,11 +304,14 @@ for i, gesture in enumerate(order, start=1):
         frame, _ = read_frame()
         if frame is None:
             break
-        show(frame, [f"Lagret: {len(points)} bilder", "u = angre dette kastet"])
+        show(frame, [f"Lagret: {len(points)} bilder", check,
+                     f"Totalt denne gangen: {len(saved)}", "u = angre dette kastet"])
         key = cv2.waitKey(1) & 0xFF
         if key == ord("u") and saved:
             delete_throw(saved.pop())
             counts[gesture] -= 1
+            if last_ok:
+                mp_ok -= 1
             print("  Angret, kastet er slettet")
             break
 
@@ -255,3 +321,7 @@ cv2.destroyAllWindows()
 print(f"\nFerdig. {len(saved)} kast lagret i {OUT_DIR}")
 for g in GESTURES:
     print(f"  {g}: {counts[g]}")
+if MODE == "ring_little" and saved:
+    print(f"MediaPipe så riktig mønster (ring+lille strake) i {mp_ok} av {len(saved)} kast")
+    if mp_ok < len(saved):
+        print("Sjekk kastene med ADVARSEL før trening: der er MediaPipe-merkene trolig feil")

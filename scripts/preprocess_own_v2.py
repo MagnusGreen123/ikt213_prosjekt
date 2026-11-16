@@ -8,7 +8,7 @@ sys.path.insert(0, str(ROOT))
 from src.detection.boxes import box_from_landmarks
 
 REC_DIR = ROOT / "data" / "recordings"
-OUT = ROOT / "data" / "processed" / "detector_192_palm.npz"
+OUT = ROOT / "data" / "processed" / "detector_192_palm_alan.npz"
 
 SIZE = 192
 

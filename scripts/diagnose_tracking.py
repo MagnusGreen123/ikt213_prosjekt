@@ -159,12 +159,12 @@ def run_test(name, instruction):
 
 tests = [
     ("stein_rolig", "Hold en knyttet neve helt stille i firkanten"),
-    ("papir_rolig", "Hold flat haand helt stille i firkanten"),
+    ("papir_rolig", "Hold flat hånd helt stille i firkanten"),
     ("saks_rolig", "Hold saks (peke + lang) helt stille"),
     ("saks_ring_lille", "Hold saks med ringfinger + lillefinger helt stille"),
     ("bevegelse", "Kast stein-saks-papir gjentatte ganger i normalt tempo"),
-    ("avstand_naer", "Hold haanden naermere kameraet enn vanlig, rolig"),
-    ("avstand_langt", "Hold haanden lenger unna kameraet, rolig"),
+    ("avstand_naer", "Hold hånden nærmere kameraet enn vanlig, rolig"),
+    ("avstand_langt", "Hold hånden lenger unna kameraet, rolig"),
 ]
 
 results = []

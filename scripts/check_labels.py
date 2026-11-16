@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
-REC_DIR = ROOT / "data" / "recordings"
+REC_DIR = ROOT / "data" / "recordings" / "recordings"
 
 SAMPLES = 30
 SECONDS = 2.0

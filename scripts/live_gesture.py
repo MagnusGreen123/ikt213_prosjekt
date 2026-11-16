@@ -1,4 +1,3 @@
-
 import sys
 import time
 from pathlib import Path
@@ -8,10 +7,10 @@ import numpy as np
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from src.detection.pipeline import HandPipeline, draw_hand, draw_box
-from src.classification import gesture as G
+from src.classification import gesture_2 as G
 
-DETECTOR_PATH = ROOT / "models" / "detector_palm_neg.pt"
-LANDMARK_PATH = ROOT / "models" / "finetuned_palm_frei_v4_aug_heavy.pt"
+DETECTOR_PATH = ROOT / "models" / "detector_palm_neg_v2.pt"
+LANDMARK_PATH = ROOT / "models" / "finetuned_palm_frei_v4_aug_heavy_magrl.pt"
 
 CAMERA_ID = 0
 WIDTH = 1280
