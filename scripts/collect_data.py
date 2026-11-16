@@ -17,9 +17,9 @@ CAMERA_ID = 0
 WIDTH = 1280
 HEIGHT = 720
 
-MODE = "ring_little"
-PERSON = "magnusrl"
-THROWS = 45
+MODE = "normal"  # "normal" eller "ring_little"
+PERSON = "maks"
+THROWS = 30
 COUNTDOWN = 3
 RECORD_SECONDS = 2.3
 PAUSE_SECONDS = 1.0

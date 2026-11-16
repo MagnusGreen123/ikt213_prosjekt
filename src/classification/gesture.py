@@ -12,6 +12,7 @@ PUMPS = 2
 FRAMES = 2
 SHAPE_STILL = 0.1
 AMPLITUDE = 0.3
+BOUNCE = 0.6
 REST_SPEED = 1.5
 REST_FRAMES = 2
 TIMEOUT = 1.5
@@ -19,6 +20,13 @@ MAX_MISSING = 5
 
 USE_STRAIGHTNESS = True
 STRAIGHT_THRESHOLD = 0.8
+
+EARLY = True
+LOOKAHEAD = 0.0
+RISE_SPEED = 2.0
+RISE_FOR_ALL = True
+ROCK_FRAC = 0.1
+MIN_STROKE = 3.0
 
 
 def palm_length(pts):
@@ -53,6 +61,21 @@ def classify_frame(pts):
     return gesture, confidence
 
 
+def classify_early(values, rise, threshold):
+    ahead = values + rise * LOOKAHEAD
+    rising = rise > RISE_SPEED
+    extended = (values > threshold + MARGIN) | (rising & (ahead > threshold + MARGIN))
+    bent = values < threshold - MARGIN
+    if RISE_FOR_ALL:
+        bent = bent & np.logical_not(rising)
+    if not np.all(extended | bent):
+        return None
+    gesture = COUNT_TO_GESTURE.get(int(extended.sum()))
+    if gesture == "rock" and np.any(rising):
+        return None
+    return gesture
+
+
 class ThrowDecider:
     def __init__(self, pumps=PUMPS, frames=FRAMES, open_at=None):
         self.pumps_needed = pumps
@@ -67,6 +90,7 @@ class ThrowDecider:
         self.y_min = None
         self.y_max = None
         self.bottoms = []
+        self.bottom_y = None
         self.tops = []
         self.palm = None
         self.prev_y = None
@@ -79,6 +103,9 @@ class ThrowDecider:
         self.streak_gesture = None
         self.streak = 0
         self.prev_ext = None
+        self.prev_values = None
+        self.stroke_peak = 0.0
+        self.tops_seen = 0
         self.last_still = False
         self.decision = None
         self.decision_time = None
@@ -99,6 +126,7 @@ class ThrowDecider:
             elif self.extreme - y > AMPLITUDE:
                 self.pumps += 1
                 self.bottoms.append(t)
+                self.bottom_y = self.extreme
                 self.direction, self.extreme = "up", y
         else:
             if y < self.extreme:
@@ -129,9 +157,17 @@ class ThrowDecider:
         y = pts[PALM_POINTS, 1].mean() / self.palm
 
         speed = 0.0
+        dt = None
         if self.prev_y is not None and t > self.prev_t:
-            speed = abs(y - self.prev_y) / (t - self.prev_t)
+            dt = t - self.prev_t
+            speed = abs(y - self.prev_y) / dt
         self.prev_y, self.prev_t = y, t
+
+        values, threshold = finger_values(pts)
+        rise = np.zeros(4)
+        if self.prev_values is not None and dt is not None:
+            rise = (values - self.prev_values) / dt
+        self.prev_values = values
 
         ext = finger_extension(pts)[1:]
         still = self.prev_ext is not None and np.max(np.abs(ext - self.prev_ext)) < SHAPE_STILL
@@ -139,6 +175,12 @@ class ThrowDecider:
         self.last_still = bool(still)
 
         self._count_pumps(y, t)
+
+        if len(self.tops) != self.tops_seen:
+            self.tops_seen = len(self.tops)
+            self.stroke_peak = 0.0
+        if self.direction == "down":
+            self.stroke_peak = max(self.stroke_peak, speed)
 
         if not self.window_open:
             if self.open_at is not None:
@@ -160,9 +202,14 @@ class ThrowDecider:
             self.reset()
             return None
 
-        gesture, confidence = classify_frame(pts)
+        if EARLY:
+            gesture = classify_early(values, rise, threshold)
+            sure = gesture is not None
+        else:
+            gesture, confidence = classify_frame(pts)
+            sure = gesture is not None and confidence >= MARGIN and still
 
-        if gesture is not None and confidence >= MARGIN and still:
+        if sure:
             if gesture == self.streak_gesture:
                 self.streak += 1
             else:
@@ -176,7 +223,14 @@ class ThrowDecider:
         if self.streak_gesture in ("paper", "scissors") and self.streak >= self.frames_needed:
             return self._decide(self.streak_gesture, t)
 
-        if at_rest and self.streak_gesture is not None and self.direction == "down":
+        if EARLY and self.streak_gesture == "rock" and self.streak >= self.frames_needed \
+                and self.direction == "down" and self.stroke_peak >= MIN_STROKE \
+                and speed < ROCK_FRAC * self.stroke_peak:
+            return self._decide("rock", t)
+
+        at_bottom = self.direction == "down" or \
+            (self.bottom_y is not None and self.bottom_y - y < BOUNCE)
+        if at_rest and self.streak_gesture is not None and at_bottom:
             return self._decide(self.streak_gesture, t)
 
         return None

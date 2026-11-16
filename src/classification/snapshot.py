@@ -3,7 +3,7 @@
 from pathlib import Path
 import cv2
 import numpy as np
-from src.classification import gesture_2 as G
+from src.classification import gesture as G
 
 TILE = 400
 BARS_H = 190

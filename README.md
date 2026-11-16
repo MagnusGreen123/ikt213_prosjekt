@@ -89,7 +89,7 @@ away, against a dark background, in a well lit room. Section 3 explains why.
 ### Diagnostics
 
 ```bash
-python scripts/diagnose_full_v2.py
+python scripts/eval/diagnose_full_v2.py
 ```
 
 Nine scripted scenarios, twice each, eight seconds per run. It prompts on
@@ -173,11 +173,10 @@ configuration to the `.venv` interpreter.
 ```
 src/
   detection/      hand detector, landmark model, crop geometry, runtime pipeline
-  capture/        camera handling
   classification/ gesture classification (in progress)
-  game/           game rules (in progress)
-  ui/             display (in progress)
 scripts/          entry points: data collection, preprocessing, evaluation
+  eval/           evaluation and measurement scripts
+old/              scripts no longer in use
 tests/            unit tests
 models/           trained model weights
 data/             datasets and recordings (not in git)

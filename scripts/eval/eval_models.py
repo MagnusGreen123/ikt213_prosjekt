@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 import torchvision
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 OWN = ROOT / "data" / "processed" / "own_128_palm.npz"
 FREIHAND = ROOT / "data" / "processed" / "freihand_128.npz"
 MODEL_DIR = ROOT / "models"

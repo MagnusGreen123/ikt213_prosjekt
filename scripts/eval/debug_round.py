@@ -2,9 +2,9 @@ import sys
 from pathlib import Path
 import numpy as np
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT))
-from src.classification import gesture_2 as G
+from src.classification import gesture as G
 from src.classification.testset import load_session, reference_rest
 
 DATA = ROOT / "data" / "testset"

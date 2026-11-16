@@ -6,9 +6,9 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT))
-from src.classification import gesture_2 as G
+from src.classification import gesture as G
 from src.classification.testset import load_session, reference_rest, palm_y
 
 DATA = ROOT / "data" / "testset"

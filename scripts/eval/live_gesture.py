@@ -4,10 +4,10 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT))
 from src.detection.pipeline import HandPipeline, draw_hand, draw_box
-from src.classification import gesture_2 as G
+from src.classification import gesture as G
 
 DETECTOR_PATH = ROOT / "models" / "detector_palm_neg_v2.pt"
 LANDMARK_PATH = ROOT / "models" / "finetuned_palm_frei_v4_aug_heavy_magrl.pt"

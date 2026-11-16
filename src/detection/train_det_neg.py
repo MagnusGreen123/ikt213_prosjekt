@@ -38,13 +38,13 @@ if USE_EXTRA_AUG:
     import sys
     sys.path.insert(0, str(ROOT / "src" / "detection"))
     try:
-        import augment_extra
+        import aug_extra as augment_extra
         if hasattr(augment_extra, "BLUR_SIZE"):
             augment_extra.BLUR_SIZE = EXTRA_BLUR_SIZE
         extra_augment = augment_extra.extra_augment
         print("Ekstra augmentering: på")
     except ImportError:
-        print("Fant ikke augment_extra.py i src/detection, kjører uten ekstra augmentering")
+        print("Fant ikke aug_extra.py i src/detection, kjører uten ekstra augmentering")
 
 
 class Detector(nn.Module):

@@ -3,16 +3,16 @@ from pathlib import Path
 import numpy as np
 import cv2
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT))
 from src.detection.pipeline import HandPipeline
 from src.classification import gesture as G
 
-REC_DIR = ROOT / "data" / "recordings"
+REC_DIR = ROOT / "data" / "testset"
 DETECTOR_PATH = ROOT / "models" / "detector_palm_neg_v2.pt"
 LANDMARK_PATH = ROOT / "models" / "finetuned_palm_frei_v4_aug_heavy_magrl.pt"
 
-PERSONS = ["magnus2"]
+PERSONS = ["maks"]
 
 END_FRAMES = 5
 GESTURES = ["rock", "paper", "scissors"]

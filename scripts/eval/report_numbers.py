@@ -6,9 +6,9 @@ from pathlib import Path
 import numpy as np
 import cv2
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT))
-from src.classification import gesture_2 as G
+from src.classification import gesture as G
 
 REC_DIR = ROOT / "data" / "recordings"
 TEST_DIR = ROOT / "data" / "testset"

@@ -5,7 +5,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 
 VIDEO = ROOT / "data" / "latency" / "IMG_0068.mov"
 CAPTURE_FPS = 240
