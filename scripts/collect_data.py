@@ -18,8 +18,8 @@ WIDTH = 1280
 HEIGHT = 720
 
 MODE = "normal"  # "normal" eller "ring_little"
-PERSON = "maks"
-THROWS = 30
+PERSON = "new_person"
+THROWS = 5
 COUNTDOWN = 3
 RECORD_SECONDS = 2.3
 PAUSE_SECONDS = 1.0
