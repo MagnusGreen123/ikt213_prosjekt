@@ -5,3 +5,4 @@
 mediapipe==0.10.14
 numpy==2.5.3
 opencv-python==5.0.0.93
+matplotlib==3.11.2
