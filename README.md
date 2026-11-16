@@ -91,8 +91,8 @@ finger. Both hands work.
 hand roughly 50 cm from the camera, and only the throwing hand in view. A white
 wall in dim light does not work: every throw is read as paper.
 
-For each lock, the game saves the last frames with landmarks and finger values
-to `results/locks/`. Turn this off with `SAVE_LOCKS = False`.
+To save the last frames of each lock with landmarks and finger values to
+`results/locks/`, set `SAVE_LOCKS = True` at the top of the script.
 
 ---
 
